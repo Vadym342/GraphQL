@@ -1,8 +1,6 @@
-const { products } = require('../consts/products');
-
 exports.Category = {
-    products: ({ id: categoryId }, {filter}, { products }) => {
-        const categoryProducts = products.filter(el => el.categoryId === categoryId);
+    products: ({ id: categoryId }, {filter}, { db }) => {
+        const categoryProducts = db.products.filter(el => el.categoryId === categoryId);
         let filteredCategoryProducts = categoryProducts;
 
         if(filter){
