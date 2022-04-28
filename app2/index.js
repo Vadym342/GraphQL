@@ -5,6 +5,42 @@ const typeDefs = gql`
     cars: [Car!]!
   }
 
+  type Mutation {
+    groupDelete(groupId: ID!)
+    groupPublish(groupId: ID!)
+    groupUnpublish(groupId: ID!, carId: ID!)
+    groupAddCars(groupId: ID!, carId: ID!)
+    groupRemoveCars(groupId: ID!, carId: ID!)
+    groupCreate(
+      groupInput: GroupInput!
+    )
+    groupUpdate(
+      groupId: ID!
+      groupInput: GroupInput!
+    ): GroupUpdatePayload!
+  }
+
+  type GroupUpdatePayload {
+    userErrors: [UserErrors!]!
+    group: Group
+  }
+
+  type UserErrors {
+    message: String!
+    field: [String!]!
+  }
+
+  input GroupInput {
+      name: String
+      image: ImageInput
+      description: String
+      featureSet: GroupFeatureFields
+  }
+
+  input ImageInput {
+    url: String!
+  }
+
   type Car {
     id: ID!
     color: String!
@@ -14,21 +50,35 @@ const typeDefs = gql`
   type Group {
     id: ID!
     featureSet: GroupFeatureSet
-    cars: [Car!]!
+    hasCar(id: ID!): Boolean!
+    cars(skip: Int!, take: Int!): [Car!]!
     name: String!
-    imageID: ID!
-    bodyHtml: String!
+    imageID:Image!
+    description: String!
   }
+
+  type Image {
+    id: ID!
+    url: String!
+  }
+
 
   type GroupFeatureSet {
     features: [GroupFeatures!]!
-    applyFeatureSeperately: Boolean!
+    applyFeatureSeperately: Boolean! 
   }
 
   type  GroupFeatures {
-    feature: String!
+    feature: GroupFeatureFields!
   }
 
+  enum GroupFeatureFields {
+    INCLINE_ENGINE
+    FOUR_CYLINDER_ENGINE
+    TWIN_CYLUNDER_ENGINE
+    RED_PAINT
+    BLACK_PAINT
+  }
 `;
 
 const server = new ApolloServer({
