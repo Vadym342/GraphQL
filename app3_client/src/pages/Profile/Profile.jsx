@@ -1,10 +1,46 @@
+import { gql, useQuery } from '@apollo/client';
 import React from "react";
 import { useParams } from "react-router";
 import AddPostModal from "../../components/AddPostModal/AddPostModal";
 import Post from "../../components/Post/Post";
 
+
+const GET_PROFILE = gql`
+query GetProfile($userId: ID!){ 
+  profile(userId: $userId){
+    bio
+    isMyProfile
+    user {
+      id
+      name
+      posts {
+        id
+        title
+        content
+        createdAt
+        published
+      }
+    }
+  }
+}
+`
+
 export default function Profile() {
   const { id } = useParams();
+
+  const { data, error, loading } = useQuery(GET_PROFILE, {
+    variables: {
+      userId: id
+    }
+  });
+  console.log(error)
+  console.log(id);
+  console.log(data);
+  if (error) return <div>Error Page</div>;
+
+  if (loading) return <div>Spinner...</div>;
+
+  const { profile } = data;
 
   return (
     <div>
@@ -16,12 +52,23 @@ export default function Profile() {
         }}
       >
         <div>
-          <h1>Profile Name</h1>
-          <p>Profile Bio</p>
+          <h1>{profile.user.name}</h1>
+          <p>{profile.bio}</p>
         </div>
-        <div>{"profile" ? <AddPostModal /> : null}</div>
+        <div>{profile.isMyProfile ? <AddPostModal /> : null}</div>
       </div>
-      <div></div>
+      <div>{profile.user.posts.map(post => {
+        return <Post
+          key={post.id}
+          title={post.title}
+          content={post.content}
+          data={post.createdAt}
+          id={post.id}
+          user={profile.user.name}
+          published={post.published}
+          isMyProfile={profile.isMyProfile}
+        />
+      })}</div>
     </div>
   );
 }
