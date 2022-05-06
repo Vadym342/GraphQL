@@ -10,7 +10,7 @@ export const Profile = {
     user: (parent: ProfileParentType, __: any, { userInfo, prisma }: Context) => {
         return prisma.user.findUnique({
             where: {
-                id: parent.id
+                id: parent.userId
             }
         })
     },
